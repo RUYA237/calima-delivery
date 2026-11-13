@@ -1,8 +1,9 @@
-from datos import ESTADOS
-from validaciones import pedir_entero, pedir_opcion
+from datos import ESTADOS, buscar_producto
+from validaciones import pedir_entero, pedir_opcion, pedir_texto_no_vacio
 
 OPCION_VOLVER = 0
 OPCION_LISTAR_PEDIDOS = 1
+OPCION_VER_DETALLE = 2
 OPCION_MAXIMA = 4
 
 FILTRO_TODOS = "todos"
@@ -11,6 +12,7 @@ FILTROS_PEDIDOS = (FILTRO_TODOS, FILTRO_ESTADO)
 
 MENSAJE_PROXIMAMENTE = "Próximamente."
 MENSAJE_SIN_PEDIDOS = "No hay pedidos con ese criterio."
+MENSAJE_PEDIDO_NO_EXISTE = "Error: no existe ningún pedido con ese identificador."
 
 ANCHO_ID = 10
 ANCHO_CLIENTE = 22
@@ -18,6 +20,9 @@ ANCHO_TOTAL = 12
 ANCHO_ESTADO = 16
 ANCHO_LINEA = ANCHO_ID + ANCHO_CLIENTE + ANCHO_TOTAL + ANCHO_ESTADO
 SEPARADOR = "-" * ANCHO_LINEA
+
+ANCHO_DETALLE = 60
+SEPARADOR_DETALLE = "-" * ANCHO_DETALLE
 
 MENU_EMPRESA = (
     "\n--- MODO EMPRESA ---\n" +
@@ -65,14 +70,48 @@ def listar_pedidos(pedidos):
     mostrar_listado_pedidos(seleccionados)
 
 
-def menu_empresa(pedidos):
+def buscar_pedido(pedidos, id_pedido):
+    for pedido in pedidos:
+        if pedido["id_pedido"] == id_pedido:
+            return pedido
+    return None
+
+
+def mostrar_detalle(catalogo, pedido):
+    print(SEPARADOR_DETALLE)
+    print(f"Pedido:    {pedido['id_pedido']}")
+    print(f"Cliente:   {pedido['cliente']}")
+    print(f"Dirección: {pedido['direccion']}")
+    print("Líneas:")
+    for id_producto, cantidad, precio_unitario in pedido["lineas"]:
+        nombre = buscar_producto(catalogo, id_producto)["nombre"]
+        subtotal = cantidad * precio_unitario
+        print(f"  {cantidad} x {nombre} ({id_producto}) a {precio_unitario:.2f} € = {subtotal:.2f} €")
+    print(f"Total:     {pedido['total_eur']:.2f} €")
+    print(f"Estado:    {pedido['estado']}")
+    print(SEPARADOR_DETALLE)
+
+
+def ver_detalle_pedido(catalogo, pedidos):
+    id_pedido = pedir_texto_no_vacio("Identificador del pedido: ").upper()
+    pedido = buscar_pedido(pedidos, id_pedido)
+    if pedido is None:
+        print(MENSAJE_PEDIDO_NO_EXISTE)
+        return
+    mostrar_detalle(catalogo, pedido)
+
+
+def menu_empresa(catalogo, pedidos):
     salir = False
     while not salir:
         print(MENU_EMPRESA)
         opcion = pedir_entero("Elige una opción: ", OPCION_VOLVER, OPCION_MAXIMA)
         if opcion == OPCION_LISTAR_PEDIDOS:
             listar_pedidos(pedidos)
+        elif opcion == OPCION_VER_DETALLE:
+            ver_detalle_pedido(catalogo, pedidos)
         elif opcion == OPCION_VOLVER:
             salir = True
         else:
             print(MENSAJE_PROXIMAMENTE)
+    return pedidos

@@ -3,6 +3,9 @@ ESTADOS = ("recibido", "en_preparacion", "en_reparto", "entregado", "cancelado")
 ENVIO_EUR = 2.50
 ENVIO_GRATIS_DESDE_EUR = 25.00
 DECIMALES = 2
+PREFIJO_ID_PEDIDO = "PED-"
+DIGITOS_ID_PEDIDO = 3
+ESTADO_INICIAL = ESTADOS[0]
 
 CATALOGO = [
     {"id_producto": "P01", "nombre": "Pizza Margarita", "restaurante": "Napoli Pizza",
@@ -79,6 +82,9 @@ def calcular_total(lineas):
     subtotal = calcular_subtotal(lineas)
     return round(subtotal + calcular_envio(subtotal), DECIMALES)
 
+def generar_id_pedido(pedidos):
+    numero = len(pedidos) + 1
+    return f"{PREFIJO_ID_PEDIDO}{numero:0{DIGITOS_ID_PEDIDO}d}"
 
 def crear_pedido(id_pedido, cliente, direccion, lineas, estado):
     return {

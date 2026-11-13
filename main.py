@@ -23,9 +23,9 @@ def menu_principal(catalogo, pedidos):
         print(MENU_PRINCIPAL)
         opcion = pedir_entero("Elige una opción: ", OPCION_SALIR, OPCION_EMPRESA)
         if opcion == OPCION_CLIENTE:
-            carrito = menu_cliente(catalogo, carrito)
+            carrito, pedidos = menu_cliente(catalogo, carrito, pedidos)
         elif opcion == OPCION_EMPRESA:
-            menu_empresa(pedidos)
+            pedidos = menu_empresa(catalogo, pedidos)
         else:
             salir = True
     print(MENSAJE_DESPEDIDA)

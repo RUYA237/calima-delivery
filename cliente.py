@@ -1,5 +1,6 @@
-from datos import (CATEGORIAS, buscar_producto, carrito_a_lineas,
-                   calcular_subtotal, calcular_envio, calcular_total)
+from datos import (CATEGORIAS, ESTADO_INICIAL, buscar_producto, carrito_a_lineas,
+                   calcular_subtotal, calcular_envio, calcular_total,
+                   crear_carrito_vacio, crear_pedido, generar_id_pedido)
 from validaciones import pedir_entero, pedir_opcion, pedir_texto_no_vacio
 
 OPCION_VOLVER = 0
@@ -7,6 +8,8 @@ OPCION_VER_CATALOGO = 1
 OPCION_ANADIR_CARRITO = 2
 OPCION_QUITAR_CARRITO = 3
 OPCION_VER_CARRITO = 4
+OPCION_CONFIRMAR_PEDIDO = 5
+OPCION_VER_MIS_PEDIDOS = 6
 OPCION_MAXIMA = 6
 
 ID_CANCELAR = "0"
@@ -19,13 +22,14 @@ FILTROS_CATALOGO = (FILTRO_TODO, FILTRO_RESTAURANTE, FILTRO_CATEGORIA)
 
 TEXTO_DISPONIBLE = "Sí"
 TEXTO_NO_DISPONIBLE = "No"
-MENSAJE_PROXIMAMENTE = "Próximamente."
 MENSAJE_CATALOGO_VACIO = "No hay productos con ese criterio."
 MENSAJE_ID_NO_EXISTE = "Error: no existe ningún producto con ese identificador."
 MENSAJE_NO_DISPONIBLE = "Error: ese producto no está disponible ahora mismo."
 MENSAJE_NO_EN_CARRITO = "Error: ese producto no está en el carrito."
 MENSAJE_CARRITO_VACIO = "El carrito está vacío."
 MENSAJE_CANCELADA = "Operación cancelada."
+MENSAJE_PEDIDO_CONFIRMADO = "Pedido confirmado."
+MENSAJE_SIN_PEDIDOS_CLIENTE = "No hay pedidos a nombre de ese cliente."
 
 ANCHO_ID = 6
 ANCHO_NOMBRE = 30
@@ -45,6 +49,13 @@ ANCHO_LINEA_CARRITO = (ANCHO_ID + ANCHO_CARRITO_NOMBRE + ANCHO_CARRITO_CANTIDAD
                        + ANCHO_CARRITO_PRECIO + ANCHO_CARRITO_SUBTOTAL)
 ANCHO_ETIQUETA_RESUMEN = ANCHO_LINEA_CARRITO - ANCHO_CARRITO_SUBTOTAL
 SEPARADOR_CARRITO = "-" * ANCHO_LINEA_CARRITO
+
+ANCHO_MIS_PEDIDOS_ID = 10
+ANCHO_MIS_PEDIDOS_TOTAL = 12
+ANCHO_MIS_PEDIDOS_ESTADO = 16
+ANCHO_LINEA_MIS_PEDIDOS = (ANCHO_MIS_PEDIDOS_ID + ANCHO_MIS_PEDIDOS_TOTAL
+                           + ANCHO_MIS_PEDIDOS_ESTADO)
+SEPARADOR_MIS_PEDIDOS = "-" * ANCHO_LINEA_MIS_PEDIDOS
 
 MENU_CLIENTE = (
     "\n--- MODO CLIENTE ---\n" +
@@ -199,7 +210,70 @@ def mostrar_carrito(catalogo, carrito):
     print(f"{'Total (€)':>{ANCHO_ETIQUETA_RESUMEN}}{total:>{ANCHO_CARRITO_SUBTOTAL}.2f}")
 
 
-def menu_cliente(catalogo, carrito):
+def mostrar_ticket(catalogo, pedido):
+    print(SEPARADOR_CARRITO)
+    print(f"Pedido:    {pedido['id_pedido']}")
+    print(f"Cliente:   {pedido['cliente']}")
+    print(f"Dirección: {pedido['direccion']}")
+    print(SEPARADOR_CARRITO)
+    print(f"{'ID':<{ANCHO_ID}}{'Producto':<{ANCHO_CARRITO_NOMBRE}}"
+          f"{'Cantidad':>{ANCHO_CARRITO_CANTIDAD}}{'Precio (€)':>{ANCHO_CARRITO_PRECIO}}"
+          f"{'Subtotal (€)':>{ANCHO_CARRITO_SUBTOTAL}}")
+    print(SEPARADOR_CARRITO)
+    for id_producto, cantidad, precio_unitario in pedido["lineas"]:
+        nombre = buscar_producto(catalogo, id_producto)["nombre"]
+        print(f"{id_producto:<{ANCHO_ID}}{nombre:<{ANCHO_CARRITO_NOMBRE}}"
+              f"{cantidad:>{ANCHO_CARRITO_CANTIDAD}}{precio_unitario:>{ANCHO_CARRITO_PRECIO}.2f}"
+              f"{cantidad * precio_unitario:>{ANCHO_CARRITO_SUBTOTAL}.2f}")
+    print(SEPARADOR_CARRITO)
+    print(f"{'Total (€)':>{ANCHO_ETIQUETA_RESUMEN}}{pedido['total_eur']:>{ANCHO_CARRITO_SUBTOTAL}.2f}")
+    print(f"Estado: {pedido['estado']}")
+
+
+def confirmar_pedido(catalogo, carrito, pedidos):
+    if len(carrito) == 0:
+        print(MENSAJE_CARRITO_VACIO)
+        return carrito, pedidos
+    cliente = pedir_texto_no_vacio("Nombre del cliente: ")
+    direccion = pedir_texto_no_vacio("Dirección de entrega: ")
+    lineas = carrito_a_lineas(catalogo, carrito)
+    pedido = crear_pedido(generar_id_pedido(pedidos), cliente, direccion,
+                          lineas, ESTADO_INICIAL)
+    nuevos_pedidos = []
+    for existente in pedidos:
+        nuevos_pedidos.append(existente)
+    nuevos_pedidos.append(pedido)
+    print(MENSAJE_PEDIDO_CONFIRMADO)
+    mostrar_ticket(catalogo, pedido)
+    return crear_carrito_vacio(), nuevos_pedidos
+
+
+def filtrar_pedidos_por_cliente(pedidos, nombre):
+    encontrados = []
+    for pedido in pedidos:
+        if pedido["cliente"].lower() == nombre.lower():
+            encontrados.append(pedido)
+    return encontrados
+
+
+def ver_mis_pedidos(pedidos):
+    nombre = pedir_texto_no_vacio("Nombre del cliente: ")
+    encontrados = filtrar_pedidos_por_cliente(pedidos, nombre)
+    if len(encontrados) == 0:
+        print(MENSAJE_SIN_PEDIDOS_CLIENTE)
+        return
+    print(SEPARADOR_MIS_PEDIDOS)
+    print(f"{'Pedido':<{ANCHO_MIS_PEDIDOS_ID}}{'Total (€)':>{ANCHO_MIS_PEDIDOS_TOTAL}}"
+          f"{'Estado':>{ANCHO_MIS_PEDIDOS_ESTADO}}")
+    print(SEPARADOR_MIS_PEDIDOS)
+    for pedido in encontrados:
+        print(f"{pedido['id_pedido']:<{ANCHO_MIS_PEDIDOS_ID}}"
+              f"{pedido['total_eur']:>{ANCHO_MIS_PEDIDOS_TOTAL}.2f}"
+              f"{pedido['estado']:>{ANCHO_MIS_PEDIDOS_ESTADO}}")
+    print(SEPARADOR_MIS_PEDIDOS)
+
+
+def menu_cliente(catalogo, carrito, pedidos):
     salir = False
     while not salir:
         print(MENU_CLIENTE)
@@ -212,8 +286,10 @@ def menu_cliente(catalogo, carrito):
             carrito = quitar_del_carrito(catalogo, carrito)
         elif opcion == OPCION_VER_CARRITO:
             mostrar_carrito(catalogo, carrito)
-        elif opcion == OPCION_VOLVER:
-            salir = True
+        elif opcion == OPCION_CONFIRMAR_PEDIDO:
+            carrito, pedidos = confirmar_pedido(catalogo, carrito, pedidos)
+        elif opcion == OPCION_VER_MIS_PEDIDOS:
+            ver_mis_pedidos(pedidos)
         else:
-            print(MENSAJE_PROXIMAMENTE)
-    return carrito
+            salir = True
+    return carrito, pedidos
