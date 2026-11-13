@@ -52,6 +52,16 @@ def crear_linea(catalogo, id_producto, cantidad):
     return (id_producto, cantidad, producto["precio_eur"])
 
 
+def crear_carrito_vacio():
+    return {}
+
+
+def carrito_a_lineas(catalogo, carrito):
+    lineas = []
+    for id_producto in carrito:
+        lineas.append(crear_linea(catalogo, id_producto, carrito[id_producto]))
+    return lineas
+
 def calcular_subtotal(lineas):
     subtotal = 0
     for id_producto, cantidad, precio_unitario in lineas:

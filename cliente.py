@@ -1,9 +1,16 @@
-from datos import CATEGORIAS
-from validaciones import pedir_entero, pedir_opcion
+from datos import (CATEGORIAS, buscar_producto, carrito_a_lineas,
+                   calcular_subtotal, calcular_envio, calcular_total)
+from validaciones import pedir_entero, pedir_opcion, pedir_texto_no_vacio
 
 OPCION_VOLVER = 0
 OPCION_VER_CATALOGO = 1
+OPCION_ANADIR_CARRITO = 2
+OPCION_QUITAR_CARRITO = 3
+OPCION_VER_CARRITO = 4
 OPCION_MAXIMA = 6
+
+ID_CANCELAR = "0"
+CANTIDAD_MINIMA = 1
 
 FILTRO_TODO = "todo"
 FILTRO_RESTAURANTE = "restaurante"
@@ -14,6 +21,11 @@ TEXTO_DISPONIBLE = "Sí"
 TEXTO_NO_DISPONIBLE = "No"
 MENSAJE_PROXIMAMENTE = "Próximamente."
 MENSAJE_CATALOGO_VACIO = "No hay productos con ese criterio."
+MENSAJE_ID_NO_EXISTE = "Error: no existe ningún producto con ese identificador."
+MENSAJE_NO_DISPONIBLE = "Error: ese producto no está disponible ahora mismo."
+MENSAJE_NO_EN_CARRITO = "Error: ese producto no está en el carrito."
+MENSAJE_CARRITO_VACIO = "El carrito está vacío."
+MENSAJE_CANCELADA = "Operación cancelada."
 
 ANCHO_ID = 6
 ANCHO_NOMBRE = 30
@@ -24,6 +36,15 @@ ANCHO_DISPONIBLE = 13
 ANCHO_LINEA = (ANCHO_ID + ANCHO_NOMBRE + ANCHO_RESTAURANTE + ANCHO_CATEGORIA
                + ANCHO_PRECIO + ANCHO_DISPONIBLE)
 SEPARADOR = "-" * ANCHO_LINEA
+
+ANCHO_CARRITO_NOMBRE = 30
+ANCHO_CARRITO_CANTIDAD = 10
+ANCHO_CARRITO_PRECIO = 13
+ANCHO_CARRITO_SUBTOTAL = 15
+ANCHO_LINEA_CARRITO = (ANCHO_ID + ANCHO_CARRITO_NOMBRE + ANCHO_CARRITO_CANTIDAD
+                       + ANCHO_CARRITO_PRECIO + ANCHO_CARRITO_SUBTOTAL)
+ANCHO_ETIQUETA_RESUMEN = ANCHO_LINEA_CARRITO - ANCHO_CARRITO_SUBTOTAL
+SEPARADOR_CARRITO = "-" * ANCHO_LINEA_CARRITO
 
 MENU_CLIENTE = (
     "\n--- MODO CLIENTE ---\n" +
@@ -94,14 +115,105 @@ def ver_catalogo(catalogo):
     mostrar_catalogo(productos)
 
 
-def menu_cliente(catalogo):
+def copiar_carrito(carrito):
+    copia = {}
+    for id_producto in carrito:
+        copia[id_producto] = carrito[id_producto]
+    return copia
+
+
+def pedir_producto_disponible(catalogo):
+    while True:
+        id_producto = pedir_texto_no_vacio(
+            f"Identificador del producto ({ID_CANCELAR} para cancelar): ").upper()
+        if id_producto == ID_CANCELAR:
+            return None
+        producto = buscar_producto(catalogo, id_producto)
+        if producto is None:
+            print(MENSAJE_ID_NO_EXISTE)
+        elif not producto["disponible"]:
+            print(MENSAJE_NO_DISPONIBLE)
+        else:
+            return producto
+
+
+def anadir_al_carrito(catalogo, carrito):
+    producto = pedir_producto_disponible(catalogo)
+    if producto is None:
+        print(MENSAJE_CANCELADA)
+        return carrito
+    cantidad = pedir_entero("Cantidad: ", CANTIDAD_MINIMA)
+    nuevo = copiar_carrito(carrito)
+    id_producto = producto["id_producto"]
+    if id_producto in nuevo:
+        nuevo[id_producto] = nuevo[id_producto] + cantidad
+    else:
+        nuevo[id_producto] = cantidad
+    print(f"Añadido: {cantidad} x {producto['nombre']}.")
+    return nuevo
+
+
+def quitar_del_carrito(catalogo, carrito):
+    if len(carrito) == 0:
+        print(MENSAJE_CARRITO_VACIO)
+        return carrito
+    while True:
+        id_producto = pedir_texto_no_vacio(
+            f"Identificador del producto a quitar ({ID_CANCELAR} para cancelar): ").upper()
+        if id_producto == ID_CANCELAR:
+            print(MENSAJE_CANCELADA)
+            return carrito
+        if id_producto in carrito:
+            nuevo = {}
+            for clave in carrito:
+                if clave != id_producto:
+                    nuevo[clave] = carrito[clave]
+            nombre = buscar_producto(catalogo, id_producto)["nombre"]
+            print(f"Quitado del carrito: {nombre}.")
+            return nuevo
+        print(MENSAJE_NO_EN_CARRITO)
+
+
+def mostrar_carrito(catalogo, carrito):
+    if len(carrito) == 0:
+        print(MENSAJE_CARRITO_VACIO)
+        return
+    lineas = carrito_a_lineas(catalogo, carrito)
+    print(SEPARADOR_CARRITO)
+    print(f"{'ID':<{ANCHO_ID}}{'Producto':<{ANCHO_CARRITO_NOMBRE}}"
+          f"{'Cantidad':>{ANCHO_CARRITO_CANTIDAD}}{'Precio (€)':>{ANCHO_CARRITO_PRECIO}}"
+          f"{'Subtotal (€)':>{ANCHO_CARRITO_SUBTOTAL}}")
+    print(SEPARADOR_CARRITO)
+    for id_producto, cantidad, precio_unitario in lineas:
+        nombre = buscar_producto(catalogo, id_producto)["nombre"]
+        subtotal_linea = cantidad * precio_unitario
+        print(f"{id_producto:<{ANCHO_ID}}{nombre:<{ANCHO_CARRITO_NOMBRE}}"
+              f"{cantidad:>{ANCHO_CARRITO_CANTIDAD}}{precio_unitario:>{ANCHO_CARRITO_PRECIO}.2f}"
+              f"{subtotal_linea:>{ANCHO_CARRITO_SUBTOTAL}.2f}")
+    print(SEPARADOR_CARRITO)
+    subtotal = calcular_subtotal(lineas)
+    envio = calcular_envio(subtotal)
+    total = calcular_total(lineas)
+    print(f"{'Subtotal (€)':>{ANCHO_ETIQUETA_RESUMEN}}{subtotal:>{ANCHO_CARRITO_SUBTOTAL}.2f}")
+    print(f"{'Envío (€)':>{ANCHO_ETIQUETA_RESUMEN}}{envio:>{ANCHO_CARRITO_SUBTOTAL}.2f}")
+    print(f"{'Total (€)':>{ANCHO_ETIQUETA_RESUMEN}}{total:>{ANCHO_CARRITO_SUBTOTAL}.2f}")
+
+
+def menu_cliente(catalogo, carrito):
     salir = False
     while not salir:
         print(MENU_CLIENTE)
         opcion = pedir_entero("Elige una opción: ", OPCION_VOLVER, OPCION_MAXIMA)
         if opcion == OPCION_VER_CATALOGO:
             ver_catalogo(catalogo)
+        elif opcion == OPCION_ANADIR_CARRITO:
+            carrito = anadir_al_carrito(catalogo, carrito)
+        elif opcion == OPCION_QUITAR_CARRITO:
+            carrito = quitar_del_carrito(catalogo, carrito)
+        elif opcion == OPCION_VER_CARRITO:
+            mostrar_carrito(catalogo, carrito)
         elif opcion == OPCION_VOLVER:
             salir = True
         else:
             print(MENSAJE_PROXIMAMENTE)
+    return carrito

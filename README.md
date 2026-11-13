@@ -42,9 +42,9 @@ El programa se maneja escribiendo el número de la opción y pulsando Intro. Si 
 | Opción | Qué hace | Estado |
 |---|---|---|
 | 1. Ver catálogo | Pregunta si se quiere ver `todo`, filtrar por `restaurante` o por `categoria`, y muestra una tabla con identificador, producto, restaurante, categoría, precio y disponibilidad | Implementada |
-| 2. Añadir producto al carrito | Mostrará «Próximamente.» | Sprints siguientes |
-| 3. Quitar producto del carrito | Mostrará «Próximamente.» | Sprints siguientes |
-| 4. Ver carrito | Mostrará «Próximamente.» | Sprints siguientes |
+| 2. Añadir producto al carrito | Pide el id y la cantidad y lo añade (suma si ya estaba) | Implementada |
+| 3. Quitar producto del carrito | Pide el id y quita ese producto entero del carrito | Implementada |
+| 4. Ver carrito | Muestra las líneas, subtotal, envío y total | Implementada |
 | 5. Confirmar pedido | Mostrará «Próximamente.» | Sprints siguientes |
 | 6. Ver mis pedidos | Mostrará «Próximamente.» | Sprints siguientes |
 | 0. Volver al menú principal | Vuelve al menú anterior | Implementada |

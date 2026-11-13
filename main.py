@@ -1,4 +1,4 @@
-from datos import CATALOGO, PEDIDOS
+from datos import CATALOGO, PEDIDOS, crear_carrito_vacio
 from validaciones import pedir_entero
 from cliente import menu_cliente
 from empresa import menu_empresa
@@ -17,12 +17,13 @@ MENU_PRINCIPAL = (
 
 
 def menu_principal(catalogo, pedidos):
+    carrito = crear_carrito_vacio()
     salir = False
     while not salir:
         print(MENU_PRINCIPAL)
         opcion = pedir_entero("Elige una opción: ", OPCION_SALIR, OPCION_EMPRESA)
         if opcion == OPCION_CLIENTE:
-            menu_cliente(catalogo)
+            carrito = menu_cliente(catalogo, carrito)
         elif opcion == OPCION_EMPRESA:
             menu_empresa(pedidos)
         else:
