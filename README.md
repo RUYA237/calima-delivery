@@ -2,7 +2,6 @@
 
 Programa de consola en Python que simula una aplicación de reparto de comida a domicilio. Tiene dos modos: **cliente** (consultar el catálogo, preparar un carrito, confirmar pedidos y ver los suyos) y **empresa** (listar pedidos, ver su detalle, cambiar su estado y consultar estadísticas). Los datos de partida (16 productos, 3 restaurantes y 5 pedidos) están cargados en el propio programa y el total de cada pedido se calcula a partir de ellos.
 
-**Grupo:** XX (pendiente de completar)
 
 **Integrantes:**
 
