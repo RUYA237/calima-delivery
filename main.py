@@ -10,6 +10,7 @@ OPCION_CLIENTE = 1
 OPCION_EMPRESA = 2
 
 MENSAJE_DESPEDIDA = "Hasta pronto."
+MENSAJE_INTERRUMPIDO = "\nPrograma interrumpido. Hasta pronto."
 
 MENU_PRINCIPAL = (
     "\n=== CALIMA DELIVERY ===\n" +
@@ -19,6 +20,7 @@ MENU_PRINCIPAL = (
 
 
 def menu_principal(catalogo, pedidos):
+    """Muestra el menú de roles en bucle y guarda el carrito y los pedidos que devuelve cada modo."""
     carrito = crear_carrito_vacio()
     salir = False
     while not salir:
@@ -33,4 +35,7 @@ def menu_principal(catalogo, pedidos):
     print(MENSAJE_DESPEDIDA)
 
 
-menu_principal(CATALOGO, PEDIDOS)
+try:
+    menu_principal(CATALOGO, PEDIDOS)
+except (EOFError, KeyboardInterrupt):
+    print(MENSAJE_INTERRUMPIDO)
