@@ -16,7 +16,7 @@ Programa de consola en Python que simula una aplicación de reparto de comida a 
 Para comprobar la versión instalada:
 
 ```bash
-python3 --version
+python --version
 ```
 
 ## Cómo ejecutarlo
@@ -25,10 +25,8 @@ python3 --version
 2. Ejecuta:
 
 ```bash
-python3 main.py
+python main.py
 ```
-
-En Windows se usa `python main.py`.
 
 ### Ejecución con Docker (sin instalar Python)
 
@@ -41,16 +39,7 @@ docker run -it --rm calima-delivery
 
 La opción `-it` es necesaria para poder escribir en el menú. Al salir del programa el contenedor se elimina solo (`--rm`). La imagen se basa en `python:3.12-slim` y solo copia los cinco ficheros `.py`.
 
-#### Con Podman (Fedora)
-
-Podman usa el mismo `Dockerfile` y los mismos comandos, y no necesita `sudo`:
-
-```bash
-podman build -t calima-delivery .
-podman run -it --rm calima-delivery
-```
-
-Si pregunta de qué registro descargar `python`, elegir `docker.io/library/python:3.12-slim`. Probado en Fedora con Podman.
+También funciona con Podman: son los mismos comandos cambiando `docker` por `podman`.
 
 El programa se maneja escribiendo el número de la opción y pulsando Intro. Si se escribe algo no válido (letras, un número fuera de rango, una opción que no existe), muestra un mensaje de error y repite la pregunta.
 
@@ -102,7 +91,7 @@ calima_delivery/
 ├── Dockerfile
 ├── README.md
 └── docs/
-    └── memoria.pdf
+    └── Memoria_Calima_Delivery-Arian Olivas-Alvaro López-Raúl Yagüe.pdf
 ```
 
 | Fichero | Responsabilidad |
@@ -113,7 +102,7 @@ calima_delivery/
 | `cliente.py` | Modo cliente: menú, catálogo, carrito, confirmar pedido y ver mis pedidos. |
 | `empresa.py` | Modo empresa: menú, listar pedidos, detalle, cambio de estado y estadísticas. |
 | `Dockerfile` | Receta para ejecutar el programa en un contenedor sin instalar Python. |
-| `docs/memoria.pdf` | Memoria del proyecto. |
+| `docs/Memoria_Calima_Delivery-Arian Olivas-Alvaro López-Raúl Yagüe.pdf` | Memoria del proyecto. |
 
 ## Supuestos adoptados
 
