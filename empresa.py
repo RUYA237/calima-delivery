@@ -1,3 +1,5 @@
+"""Modo empresa: listado, detalle, cambio de estado y estadísticas de los pedidos."""
+
 from datos import DECIMALES, ESTADOS, buscar_producto, crear_pedido
 from validaciones import pedir_entero, pedir_opcion, pedir_texto_no_vacio
 

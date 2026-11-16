@@ -1,3 +1,5 @@
+"""Modo cliente: catálogo, carrito, confirmación de pedidos y consulta de pedidos."""
+
 from datos import (CATEGORIAS, ESTADO_INICIAL, buscar_producto, carrito_a_lineas,
                    calcular_subtotal, calcular_envio, calcular_total,
                    crear_carrito_vacio, crear_pedido, generar_id_pedido)

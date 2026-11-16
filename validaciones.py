@@ -1,3 +1,6 @@
+
+"""Funciones para pedir datos por teclado repitiendo la pregunta hasta que sean válidos."""
+ 
 SEPARADOR_OPCIONES = ", "
 
 

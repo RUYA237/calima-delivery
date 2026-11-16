@@ -1,3 +1,5 @@
+"""Datos de partida, constantes y funciones de cálculo de Calima Delivery."""
+
 CATEGORIAS = {"pizza", "hamburguesa", "postre", "bebida"}
 ESTADOS = ("recibido", "en_preparacion", "en_reparto", "entregado", "cancelado")
 ENVIO_EUR = 2.50

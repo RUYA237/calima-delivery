@@ -1,3 +1,5 @@
+"""Programa principal: menú de roles que lanza el modo cliente o el modo empresa."""
+
 from datos import CATALOGO, PEDIDOS, crear_carrito_vacio
 from validaciones import pedir_entero
 from cliente import menu_cliente
