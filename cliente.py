@@ -71,6 +71,7 @@ MENU_CLIENTE = (
 
 
 def obtener_restaurantes(catalogo):
+    """Devuelve la lista de restaurantes del catálogo, sin repetir y en orden de aparición."""
     vistos = set()
     restaurantes = []
     for producto in catalogo:
@@ -82,6 +83,7 @@ def obtener_restaurantes(catalogo):
 
 
 def filtrar_catalogo(catalogo, campo, valor):
+    """Devuelve una lista nueva con los productos cuyo campo tiene ese valor."""
     filtrados = []
     for producto in catalogo:
         if producto[campo] == valor:
@@ -90,6 +92,7 @@ def filtrar_catalogo(catalogo, campo, valor):
 
 
 def mostrar_catalogo(productos):
+    """Imprime la tabla de productos con su disponibilidad."""
     if len(productos) == 0:
         print(MENSAJE_CATALOGO_VACIO)
         return
@@ -116,6 +119,7 @@ def mostrar_catalogo(productos):
 
 
 def ver_catalogo(catalogo):
+    """Pregunta cómo filtrar el catálogo y muestra el resultado."""
     filtro = pedir_opcion("¿Cómo quieres ver el catálogo?", FILTROS_CATALOGO)
     if filtro == FILTRO_TODO:
         productos = catalogo
@@ -129,6 +133,7 @@ def ver_catalogo(catalogo):
 
 
 def copiar_carrito(carrito):
+    """Devuelve una copia del carrito para no modificar el original."""
     copia = {}
     for id_producto in carrito:
         copia[id_producto] = carrito[id_producto]
@@ -136,6 +141,7 @@ def copiar_carrito(carrito):
 
 
 def pedir_producto_disponible(catalogo):
+    """Pide un id hasta que sea un producto existente y disponible. Devuelve el producto, o None si se cancela."""
     while True:
         id_producto = pedir_texto_no_vacio(
             f"Identificador del producto ({ID_CANCELAR} para cancelar): ").upper()
@@ -151,6 +157,7 @@ def pedir_producto_disponible(catalogo):
 
 
 def anadir_al_carrito(catalogo, carrito):
+    """Pide producto y cantidad y devuelve un carrito nuevo con el producto añadido."""
     producto = pedir_producto_disponible(catalogo)
     if producto is None:
         print(MENSAJE_CANCELADA)
@@ -167,6 +174,7 @@ def anadir_al_carrito(catalogo, carrito):
 
 
 def quitar_del_carrito(catalogo, carrito):
+    """Pide un producto del carrito y devuelve un carrito nuevo sin él."""
     if len(carrito) == 0:
         print(MENSAJE_CARRITO_VACIO)
         return carrito
@@ -188,6 +196,7 @@ def quitar_del_carrito(catalogo, carrito):
 
 
 def mostrar_carrito(catalogo, carrito):
+    """Imprime las líneas del carrito con subtotal, envío y total."""
     if len(carrito) == 0:
         print(MENSAJE_CARRITO_VACIO)
         return
@@ -213,6 +222,7 @@ def mostrar_carrito(catalogo, carrito):
 
 
 def mostrar_ticket(catalogo, pedido):
+    """Imprime el ticket de un pedido: id, cliente, dirección, líneas, total y estado."""
     print(SEPARADOR_CARRITO)
     print(f"Pedido:    {pedido['id_pedido']}")
     print(f"Cliente:   {pedido['cliente']}")
@@ -233,6 +243,7 @@ def mostrar_ticket(catalogo, pedido):
 
 
 def confirmar_pedido(catalogo, carrito, pedidos):
+    """Crea un pedido con el carrito. Devuelve el carrito vacío y la lista de pedidos actualizada."""
     if len(carrito) == 0:
         print(MENSAJE_CARRITO_VACIO)
         return carrito, pedidos
@@ -251,6 +262,7 @@ def confirmar_pedido(catalogo, carrito, pedidos):
 
 
 def filtrar_pedidos_por_cliente(pedidos, nombre):
+    """Devuelve los pedidos cuyo cliente coincide con el nombre, sin distinguir mayúsculas."""
     encontrados = []
     for pedido in pedidos:
         if pedido["cliente"].lower() == nombre.lower():
@@ -259,6 +271,7 @@ def filtrar_pedidos_por_cliente(pedidos, nombre):
 
 
 def ver_mis_pedidos(pedidos):
+    """Pide el nombre del cliente y muestra sus pedidos con total y estado."""
     nombre = pedir_texto_no_vacio("Nombre del cliente: ")
     encontrados = filtrar_pedidos_por_cliente(pedidos, nombre)
     if len(encontrados) == 0:
@@ -276,6 +289,7 @@ def ver_mis_pedidos(pedidos):
 
 
 def menu_cliente(catalogo, carrito, pedidos):
+    """Muestra el menú del cliente en bucle. Devuelve el carrito y los pedidos actualizados."""
     salir = False
     while not salir:
         print(MENU_CLIENTE)

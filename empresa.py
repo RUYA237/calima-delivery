@@ -51,6 +51,7 @@ MENU_EMPRESA = (
 
 
 def filtrar_pedidos_por_estado(pedidos, estado):
+    """Devuelve una lista nueva con los pedidos que están en ese estado."""
     filtrados = []
     for pedido in pedidos:
         if pedido["estado"] == estado:
@@ -59,6 +60,7 @@ def filtrar_pedidos_por_estado(pedidos, estado):
 
 
 def mostrar_listado_pedidos(pedidos):
+    """Imprime la tabla de pedidos con cliente, total y estado."""
     if len(pedidos) == 0:
         print(MENSAJE_SIN_PEDIDOS)
         return
@@ -78,6 +80,7 @@ def mostrar_listado_pedidos(pedidos):
 
 
 def listar_pedidos(pedidos):
+    """Pregunta si se quieren todos los pedidos o un estado y muestra el listado."""
     filtro = pedir_opcion("¿Qué pedidos quieres listar?", FILTROS_PEDIDOS)
     if filtro == FILTRO_TODOS:
         seleccionados = pedidos
@@ -88,6 +91,7 @@ def listar_pedidos(pedidos):
 
 
 def buscar_pedido(pedidos, id_pedido):
+    """Devuelve el pedido con ese id, o None si no existe."""
     for pedido in pedidos:
         if pedido["id_pedido"] == id_pedido:
             return pedido
@@ -95,6 +99,7 @@ def buscar_pedido(pedidos, id_pedido):
 
 
 def mostrar_detalle(catalogo, pedido):
+    """Imprime cliente, dirección, líneas, total y estado de un pedido."""
     print(SEPARADOR_DETALLE)
     print(f"Pedido:    {pedido['id_pedido']}")
     print(f"Cliente:   {pedido['cliente']}")
@@ -110,6 +115,7 @@ def mostrar_detalle(catalogo, pedido):
 
 
 def ver_detalle_pedido(catalogo, pedidos):
+    """Pide un id de pedido y muestra su detalle."""
     id_pedido = pedir_texto_no_vacio("Identificador del pedido: ").upper()
     pedido = buscar_pedido(pedidos, id_pedido)
     if pedido is None:
@@ -119,6 +125,7 @@ def ver_detalle_pedido(catalogo, pedidos):
 
 
 def calcular_siguiente_estado(estado):
+    """Devuelve el estado que sigue al actual, o None si es un estado final."""
     if estado == ESTADO_RECIBIDO:
         return ESTADO_EN_PREPARACION
     if estado == ESTADO_EN_PREPARACION:
@@ -129,6 +136,7 @@ def calcular_siguiente_estado(estado):
 
 
 def reemplazar_estado(pedidos, id_pedido, nuevo_estado):
+    """Devuelve una lista de pedidos nueva con el estado cambiado en el pedido indicado."""
     nuevos = []
     for pedido in pedidos:
         if pedido["id_pedido"] == id_pedido:
@@ -141,6 +149,7 @@ def reemplazar_estado(pedidos, id_pedido, nuevo_estado):
 
 
 def cambiar_estado_pedido(pedidos):
+    """Avanza o cancela un pedido si está permitido. Devuelve la lista de pedidos, cambiada o no."""
     id_pedido = pedir_texto_no_vacio("Identificador del pedido: ").upper()
     pedido = buscar_pedido(pedidos, id_pedido)
     if pedido is None:
@@ -163,6 +172,7 @@ def cambiar_estado_pedido(pedidos):
 
 
 def calcular_ingresos(pedidos):
+    """Devuelve los ingresos y el número de pedidos no cancelados."""
     ingresos = 0
     numero_pedidos = 0
     for pedido in pedidos:
@@ -173,6 +183,7 @@ def calcular_ingresos(pedidos):
 
 
 def contar_unidades_vendidas(pedidos):
+    """Devuelve un diccionario {id_producto: unidades} sin contar los pedidos cancelados."""
     unidades = {}
     for pedido in pedidos:
         if pedido["estado"] != ESTADO_CANCELADO:
@@ -185,6 +196,7 @@ def contar_unidades_vendidas(pedidos):
 
 
 def buscar_mas_vendido(unidades):
+    """Devuelve el id y las unidades del producto más vendido."""
     mejor_id = None
     mejor_cantidad = 0
     for id_producto in unidades:
@@ -195,6 +207,7 @@ def buscar_mas_vendido(unidades):
 
 
 def mostrar_estadisticas(catalogo, pedidos):
+    """Imprime pedidos por estado, ingresos, ticket medio y producto más vendido."""
     print(SEPARADOR_DETALLE)
     print("Pedidos por estado:")
     for estado in ESTADOS:
@@ -216,6 +229,7 @@ def mostrar_estadisticas(catalogo, pedidos):
 
 
 def menu_empresa(catalogo, pedidos):
+    """Muestra el menú de la empresa en bucle. Devuelve los pedidos actualizados."""
     salir = False
     while not salir:
         print(MENU_EMPRESA)

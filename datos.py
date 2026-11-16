@@ -46,6 +46,7 @@ CATALOGO = [
 
 
 def buscar_producto(catalogo, id_producto):
+    """Devuelve el producto del catálogo con ese id, o None si no existe."""
     for producto in catalogo:
         if producto["id_producto"] == id_producto:
             return producto
@@ -53,21 +54,25 @@ def buscar_producto(catalogo, id_producto):
 
 
 def crear_linea(catalogo, id_producto, cantidad):
+    """Devuelve la línea (id_producto, cantidad, precio_unitario) usando el precio del catálogo."""
     producto = buscar_producto(catalogo, id_producto)
     return (id_producto, cantidad, producto["precio_eur"])
 
 
 def crear_carrito_vacio():
+    """Devuelve un carrito vacío: un diccionario {id_producto: cantidad}."""
     return {}
 
 
 def carrito_a_lineas(catalogo, carrito):
+    """Convierte el carrito en una lista de líneas (id_producto, cantidad, precio_unitario)."""
     lineas = []
     for id_producto in carrito:
         lineas.append(crear_linea(catalogo, id_producto, carrito[id_producto]))
     return lineas
 
 def calcular_subtotal(lineas):
+    """Devuelve la suma de cantidad por precio de todas las líneas, con dos decimales."""
     subtotal = 0
     for id_producto, cantidad, precio_unitario in lineas:
         subtotal = subtotal + cantidad * precio_unitario
@@ -75,20 +80,24 @@ def calcular_subtotal(lineas):
 
 
 def calcular_envio(subtotal):
+    """Devuelve ENVIO_EUR, o 0 si el subtotal llega a ENVIO_GRATIS_DESDE_EUR."""
     if subtotal >= ENVIO_GRATIS_DESDE_EUR:
         return 0
     return ENVIO_EUR
 
 
 def calcular_total(lineas):
+    """Devuelve el subtotal más el envío de las líneas, con dos decimales."""
     subtotal = calcular_subtotal(lineas)
     return round(subtotal + calcular_envio(subtotal), DECIMALES)
 
 def generar_id_pedido(pedidos):
+    """Devuelve el siguiente id de pedido correlativo, por ejemplo PED-006."""
     numero = len(pedidos) + 1
     return f"{PREFIJO_ID_PEDIDO}{numero:0{DIGITOS_ID_PEDIDO}d}"
 
 def crear_pedido(id_pedido, cliente, direccion, lineas, estado):
+    """Devuelve un pedido (diccionario) con el total calculado a partir de sus líneas."""
     return {
         "id_pedido": id_pedido,
         "cliente": cliente,
@@ -100,6 +109,7 @@ def crear_pedido(id_pedido, cliente, direccion, lineas, estado):
 
 
 def crear_pedidos_iniciales(catalogo):
+    """Devuelve la lista de los 5 pedidos precargados, uno por estado."""
     pedidos = []
     pedidos.append(crear_pedido(
         "PED-001", "Lucía Fernández", "Calle Alcalá 45, Madrid",
